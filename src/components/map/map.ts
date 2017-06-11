@@ -22,12 +22,13 @@ export class MapDirective implements OnInit {
 
   @Input() isPickRequested: boolean;
   @Input() destination: string;
-
+  infoWindow = new google.maps.InfoWindow();
   public map;
   public isMapIdle: boolean;
   public currentLcation: google.maps.LatLng;
   constructor(public nav: NavController,public loadingCtrl: LoadingController) {
-  }
+  
+}
   
   ngOnInit(){
   var pyrmont = new google.maps.LatLng(6.9308, 79.9842);
@@ -94,7 +95,41 @@ export class MapDirective implements OnInit {
       let lat = resp.coords.latitude;
       let lng = resp.coords.longitude;
 
+       var pos = {
+                  lat:lat,
+                  lng: lng    
+              };
+
       let location = new google.maps.LatLng(lat, lng);
+    
+      
+      
+
+          var service = new google.maps.places.PlacesService(this.map);
+       
+              service.nearbySearch({
+                  location: pos,
+                  radius: 5500,
+                  type: 'store'
+              },(res,status)=> {
+              if (status === google.maps.places.PlacesServiceStatus.OK) {
+                for (var i = 0; i < res.length; i++) {
+                    // createMarker(results[i]);
+                    
+                      var placeLoc = res[i].geometry.location;
+                     var marker = new google.maps.Marker({
+                     map : this.map,
+                    position : res[i].geometry.location
+                    });
+
+            google.maps.event.addListener(marker, 'click', function() {
+                this.infowindow.setContent(res[i].name);
+                this.infowindow.open(this.map, this);
+            });
+                }
+            }
+              });
+
         Observable.next(location);
         loading.dismiss();
 
@@ -107,6 +142,30 @@ export class MapDirective implements OnInit {
     return locationObs;
   }
 
+   callback(results, status) {
+     debugger
+            if (status === google.maps.places.PlacesServiceStatus.OK) {
+                for (var i = 0; i < results.length; i++) {
+                    // createMarker(results[i]);
+                    
+                      var placeLoc = results[i].geometry.location;
+                     var marker = new google.maps.Marker({
+                     map : this.map,
+                    position : results[i].geometry.location
+                    });
+
+            google.maps.event.addListener(marker, 'click', function() {
+                this.infowindow.setContent(results[i].name);
+                this.infowindow.open(this.map, this);
+            });
+                }
+            }
+        }
+
+  createMarker(place) {
+          debugger
+          
+        }
   createMap(location = new google.maps.LatLng(40.712784, -74.005941)) {
     let mapOptions = {
       center: location,
@@ -118,6 +177,9 @@ export class MapDirective implements OnInit {
     let mapEl = document.getElementById('map');
     let map = new google.maps.Map(mapEl,mapOptions);
 
+   
+
+   
     return map;
 
   }
@@ -127,8 +189,35 @@ export class MapDirective implements OnInit {
     }
     else{
       this.getCurrentLocation().subscribe(currentLcation =>{
+
           this.map.panTo(currentLcation)
+            var service = new google.maps.places.PlacesService(this.map);
+       
+              service.nearbySearch({
+                  location: currentLcation,
+                  radius: 5500,
+                  type: 'store'
+              },(res,status)=> {
+                debugger
+              if (status === google.maps.places.PlacesServiceStatus.OK) {
+                for (var i = 0; i < res.length; i++) {
+                    // createMarker(results[i]);
+                    
+                      var placeLoc = res[i].geometry.location;
+                     var marker = new google.maps.Marker({
+                     map : this.map,
+                    position : res[i].geometry.location
+                    });
+
+            google.maps.event.addListener(marker, 'click', function() {
+                this.infowindow.setContent(res[i].name);
+                this.infowindow.open(this.map, this);
+            });
+                }
+            }
+              });
       });
     }
+    
   }
 }
