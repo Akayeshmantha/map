@@ -1,0 +1,27 @@
+<ion-header>
+  <ion-navbar>
+      <ion-buttons start>
+        <button  ion-button [hidden]="!isPickRequested" (click)="cancelPickup()">
+          <ion-icon name="arrow-back"></ion-icon> Cancel
+        </button>
+      </ion-buttons>
+    <ion-title>
+      Hey Dude
+    </ion-title>
+     <ion-buttons end>
+        <button ion-button (click)="map.centeLocation()">
+          <ion-icon name="navigate"></ion-icon> 
+        </button>
+      </ion-buttons>
+  </ion-navbar>
+</ion-header>
+
+<ion-content class="home">
+  <div class="map-wrapper">
+  <map #map>
+  </map>
+     
+  </div>
+</ion-content>
+
+
